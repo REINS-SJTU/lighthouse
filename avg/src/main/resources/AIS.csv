@@ -1,0 +1,10 @@
+_id,aisInfo.MessageID,aisInfo.RepeatIndicator,aisInfo.MMSI,aisInfo.aisVeisonIndicator,aisInfo.callSign,aisInfo.VesselName,aisInfo.shipType,aisInfo.Destination,aisInfo.navState,aisInfo.ROT,aisInfo.SOG,aisInfo.COG,aisInfo.Longitude,aisInfo.Latitude,aisInfo.PositionAccuracy,aisInfo.trueHeading,location[0],location[1],overtakenShipID,obstaclesID,_class,routeID
+1,1,1,a,a,1,Ship1,2,a,1,1.0,40.0,3.141592653589793,100.00010000000009,31.0,1,1.0,100.00010000000009,31.0,0,0,com.example.demo.entity.AIS,4
+2,1,1,a,a,2,Ship2,1,a,1,1.0,40.0,-6.643570701684088e-8,100.00211999998832,30.00019999999867,1,1.0,100.00211999998832,30.00019999999867,0,0,com.example.demo.entity.AIS,3
+3,1,1,a,a,3,Ship3,1,a,1,1.0,40.0,0.0000013901772052055053,100.00171999489376,30.000200000027796,1,1.0,100.00171999489376,30.000200000027796,0,0,com.example.demo.entity.AIS,3
+4,1,1,a,a,4,Ship4,1,a,1,1.0,80.0,2.1745892477341493,100.828882,30.809657,1,1.0,120.828882,30.809657,0,0,com.example.demo.entity.AIS,14
+5,1,1,a,a,5,Ship5,1,a,1,1.0,60.0,0.34568152700646293,100.826761,30.810624,1,1.0,120.826761,30.810624,0,0,com.example.demo.entity.AIS,11
+6,1,1,a,a,6,Ship6,1,a,1,1.0,50.0,0.34568152700646293,120.827194,30.810786,1,1.0,120.827194,30.810786,0,0,com.example.demo.entity.AIS,12
+7,1,1,a,a,7,Ship7,1,a,1,1.0,25.0,3.12,120.825523,30.810185,1,1.0,120.825523,30.810185,0,0,com.example.demo.entity.AIS,11
+8,1,1,a,a,8,Ship8,1,a,1,1.0,50.0,3.14,120.824286,30.809727,1,1.0,120.824286,30.809727,0,0,com.example.demo.entity.AIS,12
+9,1,1,a,a,9,Ship9,1,a,1,1.0,25.0,101.0,120.829055,30.809211,1,1.0,120.829055,30.809211,0,0,com.example.demo.entity.AIS,14

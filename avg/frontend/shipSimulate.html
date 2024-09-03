@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ship Simulate</title>
+</head>
+<body>
+<button onclick="fetch_start()">start</button>
+<button onclick="fetch_stop()">stop</button>
+<br>
+<canvas id="myCanvas" width="1800" height="900" style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas
+</canvas>
+
+<script>
+
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+
+    var roads = [];
+    var obstacles = [];
+    var ships = [];
+    var baseLongitude = 120.821952;
+    var baseLatitude = 30.812547;
+    var factor1 = 180000; //for longitude
+    var factor2 = factor1 * 1.1; //for latitude
+    var id;
+    var color = {
+        0: '#a9a9a9', 1: '#e6194B', 2: '#3cb44b', 3: "#ffe119", 4: '#4363d8',
+        5: '#f58231', 6: '#911eb4', 7: '#42d4f4', 8: '#f032e6',
+        9: '#bfef45', 10: '#fabed4', 11: '#469990', 12: '#dcbeff',
+        13: '#9A6324', 14: '#fffac8', 15: '#800000', 16: '#aaffc3',
+        17: '#808000', 18: '#ffd8b1', 19: '#000075'
+    };
+
+    print_map();
+    // fetch_roadsCenter(1,118);
+    // fetch_obstacles(3,3);
+
+
+    function fetch_roadsCenter(from, to) {
+        var searchParams = new URLSearchParams();
+        searchParams.append("roadFrom", from);
+        searchParams.append("roadTo", to);
+
+        fetch('http://localhost:8080/canvas/roadsCenter', {
+            method: 'post',
+            body: searchParams
+        }).then(response => response.json()).then(data => {
+            roads.push.apply(roads, data);
+            // roads = data;
+            console.log(JSON.stringify(roads));
+            print_road();
+            print_roadID();
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+    }
+
+    function fetch_obstacles(from, to) {
+        var searchParams = new URLSearchParams();
+        searchParams.append("obstacleFrom", from);
+        searchParams.append("obstacleTo", to);
+
+        fetch('http://localhost:8080/canvas/obstacles', {
+            method: 'post',
+            body: searchParams
+        }).then(response => response.json()).then(data => {
+            obstacles = data;
+            console.log(JSON.stringify(obstacles));
+            print_obstacle();
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+    }
+
+    function fetch_ships() {
+        var searchParams = new URLSearchParams();
+        searchParams.append("shipFrom", 10);
+        searchParams.append("shipTo", 25);
+
+
+        fetch('http://localhost:8080/canvas/ships', {
+            method: 'post',
+            body: searchParams
+        }).then(response => response.json()).then(data => {
+            ships = data;
+            console.log(JSON.stringify(ships));
+            print_ship();
+            print_road();
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+    }
+
+    function fetch_start() {
+        //多长时间调用一次
+        id = setInterval(fetch_ships, 500)
+        fetch('http://localhost:8080/canvas/start', {
+            method: 'post',
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+    }
+
+    function fetch_stop() {
+        fetch('http://localhost:8080/canvas/stop', {
+            method: 'post',
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+        clearInterval(id);
+    }
+
+    function print_map() {
+        // top left（120.821952，30.812547） bottom right（120.831351，30.808824）
+        var width = (120.831351 - 120.821952) * factor1;
+        var height = (30.812547 - 30.808824) * factor2;
+        var image = new Image();
+        image.src = "./map.png";
+        image.onload = function () {
+            ctx.drawImage(image, 0, 0, width, height);
+            fetch_roadsCenter(1, 118);
+            fetch_obstacles(3, 3);
+        }
+    }
+
+    function print_road() {
+        for (var i = 0; i < roads.length; i++) {
+            var x = (roads[i].longitude - baseLongitude) * factor1;
+            var y = (baseLatitude - roads[i].latitude) * factor2;
+            ctx.fillStyle = "#FF0000";
+            if (roads[i].roadID > 99) {
+                // continue;
+                ctx.fillStyle = "#FFA500";
+            }
+            ctx.fillRect(x, y, 4, 4);
+        }
+    }
+
+    function print_roadID() {
+        for (var i = 0; i < roads.length; i++) {
+            var x = (roads[i].longitude - baseLongitude) * factor1;
+            var y = (baseLatitude - roads[i].latitude) * factor2;
+            ctx.fillStyle = "#000000";
+            ctx.fillText(roads[i].roadID, x, y);
+        }
+    }
+
+    function print_obstacle() {
+        for (var i = 0; i < obstacles.length; i++) {
+            var x = (obstacles[i].longitude - baseLongitude) * factor1;
+            var y = (baseLatitude - obstacles[i].latitude) * factor2;
+            ctx.fillStyle = "#696969";
+            ctx.fillRect(x, y, 6, 6);
+        }
+    }
+
+    function print_ship() {
+        for (var i = 0; i < ships.length; ++i) {
+            var x = (ships[i].longitude - baseLongitude) * factor1;
+            var y = (baseLatitude - ships[i].latitude) * factor2;
+
+            ctx.fillStyle = color[i];
+            // if(i==0)
+            // {ctx.fillStyle="#00D000";}
+            ctx.fillRect(x, y, 4, 4);
+        }
+    }
+
+</script>
+</body>
+</html>

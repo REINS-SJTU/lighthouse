@@ -1,0 +1,10 @@
+server:
+  port: 8090
+spring:
+  data:
+    mongodb:
+      uri: mongodb://mongo:27017/AVG
+  logging:
+    file:
+      name: /app/logs/application.log
+

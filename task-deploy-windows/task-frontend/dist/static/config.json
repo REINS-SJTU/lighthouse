@@ -1,0 +1,5 @@
+{
+    "serverHost": "localhost",
+    "navigatePort": "18090",
+    "taskPort": "18080"
+}

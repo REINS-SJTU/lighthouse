@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Avg Simulate</title>
+</head>
+<body>
+<button onclick="fetch_start()">start</button>
+<button onclick="fetch_stop()">stop</button>
+<br>
+<canvas id="myCanvas" width="1350" height="1200" style="border:1px solid #c3c3c3;">
+    Your browser does not support the HTML5 canvas
+</canvas>
+
+<script>
+
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+
+    var cars = [];
+    var roads = [];
+    var gridSize = 40; // Size of the grid cells in pixels
+    var id;
+    var color = {
+        0: '#a9a9a9', 1: '#e6194B', 2: '#3cb44b', 3: "#ffe119", 4: '#4363d8',
+        5: '#f58231', 6: '#911eb4', 7: '#42d4f4', 8: '#f032e6',
+        9: '#bfef45', 10: '#fabed4', 11: '#469990', 12: '#dcbeff',
+        13: '#9A6324', 14: '#fffac8', 15: '#800000', 16: '#aaffc3',
+        17: '#808000', 18: '#ffd8b1', 19: '#000075'
+    };
+
+    fetch_road();
+
+    function fetch_road() {
+        fetch('http://localhost:8090/avgCanvas/roads', {
+            method: 'get'
+        }).then(response => response.json()).then(data => {
+            roads = data; // Update roads data
+            console.log(JSON.stringify(roads));
+            adjustCanvasSize();
+            print_road();
+            draw_grid();
+            print_roadID();
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+    }
+
+    function fetch_start() {
+        //多长时间调用一次
+        id = setInterval(fetch_cars, 500)
+        fetch('http://localhost:8090/avgCanvas/start', {
+            method: 'post',
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+    }
+
+    function fetch_stop() {
+        fetch('http://localhost:8090/avgCanvas/stop', {
+            method: 'post',
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+        clearInterval(id);
+    }
+
+    function fetch_cars() {
+        var searchParams = new URLSearchParams();
+        //todo：修改船的数量
+        searchParams.append("carFrom", 1);
+        searchParams.append("carTo", 8);
+
+        fetch('http://localhost:8090/avgCanvas/cars', {
+            method: 'post',
+            body: searchParams
+        }).then(response => response.json()).then(data => {
+            cars = data;
+            console.log(JSON.stringify(cars));
+            console.log("画车")
+            print_car();
+        }).catch(function (e) {
+            alert("error:" + e);
+        })
+    }
+
+
+    //设置网格大小
+    function adjustCanvasSize() {
+        // Find the max x and y values in the roads data
+        let maxX = 14;
+        let maxY = 7;
+        // for (var i = 0; i < roads.length; i++) {
+        //     if (roads[i].location[0] > maxX) maxX = roads[i].location[0];
+        //     if (roads[i].location[1] > maxY) maxY = roads[i].location[1];
+        // }
+        // Set the canvas size based on the max values
+        c.width = maxX * gridSize;
+        c.height = maxY * gridSize;
+    }
+
+    function draw_grid() {
+        var width = c.width;
+        var height = c.height;
+        ctx.strokeStyle = "#030303";
+        ctx.lineWidth = 1;
+        for (var x = 0; x <= width; x += gridSize) {
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+        }
+        for (var y = 0; y <= height; y += gridSize) {
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+        }
+        ctx.stroke();
+
+    }
+
+
+    function print_road() {
+        for (var i = 0; i < roads.length; i++) {
+            var x = (roads[i].location[0] - 1) * gridSize;
+            var y = c.height - (roads[i].location[1]) * gridSize; // Adjust y for bottom-left origin
+
+            if (roads[i].valid === 0) {
+                draw_crosshatch(x, y);
+            } else {
+                ctx.fillStyle = "#ece6e6";
+                ctx.fillRect(x, y, gridSize, gridSize);
+            }
+        }
+    }
+
+    function draw_crosshatch(x, y) {
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + gridSize, y + gridSize);
+        ctx.moveTo(x + gridSize, y);
+        ctx.lineTo(x, y + gridSize);
+        ctx.stroke();
+    }
+
+    function print_roadID() {
+        for (var i = 0; i < roads.length; i++) {
+            var x = (roads[i].location[0] - 1) * gridSize;
+            var y = c.height - (roads[i].location[1]) * gridSize; // Adjust y for bottom-left origin
+            ctx.fillStyle = "#000000";
+            ctx.fillText(roads[i].roadID, x + 5, y + 15);
+        }
+    }
+
+
+    function print_car() {
+        var carSize = 10; // Size of the car
+        var offset = (gridSize - carSize) / 2; // Center the car within the grid cell
+
+        for (var i = 0; i < cars.length; ++i) {
+            console.log("车的x" + cars[i].x);
+            console.log("车的y" + cars[i].y);
+            console.log("那辆车" + i);
+            var len = 0.8;
+            var x = (cars[i].x/len ) * gridSize;
+            var y = c.height - (cars[i].y/len) * gridSize; // Adjust y for bottom-left origin
+
+
+            ctx.fillStyle = color[i % 20];
+            ctx.fillRect(x-carSize/2 , y-carSize/2 , carSize, carSize); // Adjust size and position within the grid cell
+        }
+
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+_id,roadID,time,position,_class
+1,173,0,0,com.example.demo.entity.Car
+2,216,0,0,com.example.demo.entity.Car
+3,0,0,0,com.example.demo.entity.Car
+4,199,0,0,com.example.demo.entity.Car
+5,0,0,0,com.example.demo.entity.Car
+6,132,0,0,com.example.demo.entity.Car
+7,0,0,0,com.example.demo.entity.Car
+8,323,0,0,com.example.demo.entity.Car

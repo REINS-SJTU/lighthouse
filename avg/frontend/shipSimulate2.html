@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Ship Simulate</title>
+</head>
+<body>
+<button onclick="fetch_start()">start</button>
+<button onclick="fetch_stop()">stop</button>
+<br>
+<canvas id="myCanvas" width="1500" height="800" style="border:1px solid #c3c3c3;">
+Your browser does not support the HTML5 canvas
+</canvas>
+
+<script>
+
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+
+var roads = [];
+var obstacles = [];
+var ships = [];
+var baseLongitude = 99.9998;
+var baseLatitude = 29.9995;
+var factor = 500000
+var id;
+
+fetch_roadsCenter();
+fetch_obstacles();
+
+function fetch_roadsCenter(){
+    var searchParams = new URLSearchParams();
+    searchParams.append("roadFrom", 60);
+    searchParams.append("roadTo",81);
+
+    fetch('http://localhost:8080/canvas/roadsCenter', {
+        method:'post',
+        body:searchParams
+    }).then(response => response.json()).then(data => {
+        // var obj = JSON.parse(data);
+        // roads.push.apply(roads,data);
+        roads = data;
+        console.log(JSON.stringify(roads));
+        print_canvas();
+    }).catch(function(e){
+        alert("error:" + e);
+    })
+}
+
+function fetch_obstacles(){
+    var searchParams = new URLSearchParams();
+    searchParams.append("obstacleFrom", 1);
+    searchParams.append("obstacleTo",2);
+
+    fetch('http://localhost:8080/canvas/obstacles', {
+        method:'post',
+        body:searchParams
+    }).then(response => response.json()).then(data => {
+        obstacles = data;
+        console.log(JSON.stringify(obstacles));
+        print_canvas();
+    }).catch(function(e){
+        alert("error:" + e);
+    })
+}
+
+function fetch_ships(){
+    var searchParams = new URLSearchParams();
+    searchParams.append("shipFrom", 2);
+    searchParams.append("shipTo",3);
+
+    fetch('http://localhost:8080/canvas/ships', {
+        method:'post',
+        body:searchParams
+    }).then(response => response.json()).then(data => {
+        ships = data;
+        console.log(JSON.stringify(ships));
+        print_canvas();
+    }).catch(function(e){
+        alert("error:" + e);
+    })
+}
+
+function fetch_start(){
+    id=setInterval(fetch_ships,500)
+    fetch('http://localhost:8080/canvas/start', {
+        method:'post',
+    }).catch(function(e){
+        alert("error:" + e);
+    })
+}
+
+function fetch_stop(){
+    fetch('http://localhost:8080/canvas/stop', {
+        method:'post',
+    }).catch(function(e){
+        alert("error:" + e);
+    })
+    clearInterval(id);
+}
+
+function print_canvas(){
+
+    // c.height=c.height;
+    for(var i=0;i<roads.length;i++){
+        // console.log(JSON.stringify(roads[i]));
+        var x = (roads[i].longitude - baseLongitude) *factor;
+        var y = (roads[i].latitude - baseLatitude) *factor;
+        // console.log(x);
+        // console.log(y);
+        ctx.fillStyle="#FF0000";
+        ctx.fillRect(x,y,5,5);
+    }
+    for(var i=0;i<obstacles.length;i++){
+        // console.log(JSON.stringify(obstacles[i]));
+        var x = (obstacles[i].longitude - baseLongitude) *factor;
+        var y = (obstacles[i].latitude - baseLatitude) *factor;
+        // console.log(x);
+        // console.log(y);
+        ctx.fillStyle="#696969";
+        ctx.fillRect(x,y,8,8);
+    }
+    for(var i=0;i<ships.length;i++){
+        var x = (ships[i].longitude - baseLongitude) *factor;
+        var y = (ships[i].latitude - baseLatitude) *factor;
+        if(i==0){
+            ctx.fillStyle="#00D000";
+        }else if (i == 1){
+            ctx.fillStyle="#0000FF";}
+        else
+        { ctx.fillStyle ="#FF00C6";}
+        
+        ctx.fillRect(x,y,5,5);
+    }
+
+    // two lines
+    x = (100 - baseLongitude) *factor;
+    y = (29.9999 - baseLatitude) *factor;
+    ctx.moveTo(x,y);
+    x = (100.0022 - baseLongitude) *factor;
+    y = (29.9999 - baseLatitude) *factor;
+    ctx.lineTo(x,y);
+    ctx.stroke();
+
+    x = (100 - baseLongitude) *factor;
+    y = (30.0003 - baseLatitude) *factor;
+    ctx.moveTo(x,y);
+    x = (100.0022 - baseLongitude) *factor;
+    y = (30.0003 - baseLatitude) *factor;
+    ctx.lineTo(x,y);
+    ctx.stroke();
+}
+
+</script>
+
+</body>
+</html>
